@@ -337,15 +337,19 @@ where
         } = poll_durations;
 
         // update metrics for whole poll function
-        metrics.duration_poll_tx_manager.set(start.elapsed().as_secs_f64());
+        metrics.tx_manager_acc_poll_duration_seconds.set(start.elapsed().as_secs_f64());
         // update metrics for nested expressions
-        metrics.acc_duration_poll_network_events.set(acc_network_events.as_secs_f64());
-        metrics.acc_duration_poll_pending_pool_imports.set(acc_pending_imports.as_secs_f64());
-        metrics.acc_duration_poll_transaction_events.set(acc_tx_events.as_secs_f64());
-        metrics.acc_duration_poll_imported_transactions.set(acc_imported_txns.as_secs_f64());
-        metrics.acc_duration_poll_fetch_events.set(acc_fetch_events.as_secs_f64());
-        metrics.acc_duration_fetch_pending_hashes.set(acc_pending_fetch.as_secs_f64());
-        metrics.acc_duration_poll_commands.set(acc_cmds.as_secs_f64());
+        metrics.network_events_acc_poll_duration_seconds.set(acc_network_events.as_secs_f64());
+        metrics
+            .pending_pool_imports_acc_poll_duration_seconds
+            .set(acc_pending_imports.as_secs_f64());
+        metrics.transaction_events_acc_poll_duration_seconds.set(acc_tx_events.as_secs_f64());
+        metrics
+            .imported_transactions_acc_poll_duration_seconds
+            .set(acc_imported_txns.as_secs_f64());
+        metrics.fetch_events_acc_poll_duration_seconds.set(acc_fetch_events.as_secs_f64());
+        metrics.fetch_pending_hashes_acc_duration_seconds.set(acc_pending_fetch.as_secs_f64());
+        metrics.poll_commands_acc_duration_seconds.set(acc_cmds.as_secs_f64());
     }
 
     /// Request handler for an incoming request for transactions
@@ -491,7 +495,7 @@ where
         }
 
         // Update propagated transactions metrics
-        self.metrics.propagated_transactions.increment(propagated.0.len() as u64);
+        self.metrics.propagated_transactions_total.increment(propagated.0.len() as u64);
 
         propagated
     }
@@ -551,7 +555,7 @@ where
         }
 
         // Update propagated transactions metrics
-        self.metrics.propagated_transactions.increment(propagated.0.len() as u64);
+        self.metrics.propagated_transactions_total.increment(propagated.0.len() as u64);
 
         Some(propagated)
     }
@@ -601,7 +605,7 @@ where
             self.network.send_transactions_hashes(peer_id, new_pooled_hashes);
 
             // Update propagated transactions metrics
-            self.metrics.propagated_transactions.increment(propagated.0.len() as u64);
+            self.metrics.propagated_transactions_total.increment(propagated.0.len() as u64);
 
             propagated
         };
@@ -648,9 +652,9 @@ where
             // the peer sends/announces those hashes to us. this is because, marking
             // txns as seen by a peer is done optimistically upon sending them to the
             // peer.
-            self.metrics.messages_with_hashes_already_seen_by_peer.increment(1);
+            self.metrics.messages_with_hashes_already_seen_by_peer_total.increment(1);
             self.metrics
-                .occurrences_hash_already_seen_by_peer
+                .hash_already_seen_by_peer_occurrences_total
                 .increment(count_txns_already_seen_by_peer);
 
             trace!(target: "net::tx",
@@ -687,7 +691,7 @@ where
             let already_known_hashes_count =
                 hashes_count_pre_pool_filter - partially_valid_msg.len();
             self.metrics
-                .occurrences_hashes_already_in_pool
+                .hashes_already_in_pool_occurrences_total
                 .increment(already_known_hashes_count as u64);
         }
 
@@ -991,7 +995,7 @@ where
         if txns_count_pre_pool_filter > transactions.len() {
             let already_known_txns_count = txns_count_pre_pool_filter - transactions.len();
             self.metrics
-                .occurrences_transactions_already_in_pool
+                .transactions_already_in_pool_occurrences_total
                 .increment(already_known_txns_count as u64);
         }
 
@@ -1076,9 +1080,9 @@ where
             }
 
             if num_already_seen_by_peer > 0 {
-                self.metrics.messages_with_transactions_already_seen_by_peer.increment(1);
+                self.metrics.messages_with_transactions_already_seen_by_peer_total.increment(1);
                 self.metrics
-                    .occurrences_of_transaction_already_seen_by_peer
+                    .transaction_already_seen_by_peer_occurrences_total
                     .increment(num_already_seen_by_peer);
                 trace!(target: "net::tx", num_txs=%num_already_seen_by_peer, ?peer_id, client=?peer.client_version, "Peer sent already seen transactions");
             }
@@ -1138,7 +1142,7 @@ where
 
     fn report_peer_bad_transactions(&self, peer_id: PeerId) {
         self.report_peer(peer_id, ReputationChangeKind::BadTransactions);
-        self.metrics.reported_bad_transactions.increment(1);
+        self.metrics.reported_bad_transactions_total.increment(1);
     }
 
     fn report_peer(&self, peer_id: PeerId, kind: ReputationChangeKind) {
@@ -1206,7 +1210,7 @@ where
                 self.report_peer_bad_transactions(peer_id);
             }
         }
-        self.metrics.bad_imports.increment(1);
+        self.metrics.bad_imports_total.increment(1);
         self.bad_imports.insert(err.hash);
     }
 

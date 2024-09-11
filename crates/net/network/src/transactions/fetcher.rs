@@ -107,7 +107,7 @@ impl TransactionFetcher {
         let hashes_pending_fetch = self.hashes_pending_fetch.len() as f64;
         let total_hashes = self.hashes_fetch_inflight_and_pending_fetch.len() as f64;
 
-        metrics.hashes_pending_fetch.set(hashes_pending_fetch);
+        metrics.hashes_pending_fetch_total.set(hashes_pending_fetch);
         metrics.hashes_inflight_transaction_requests.set(total_hashes - hashes_pending_fetch);
     }
 
@@ -117,9 +117,11 @@ impl TransactionFetcher {
 
         let TxFetcherSearchDurations { find_idle_peer, fill_request } = durations;
         metrics
-            .duration_find_idle_fallback_peer_for_any_pending_hash
+            .find_idle_fallback_peer_for_any_pending_hash_duration_seconds
             .set(find_idle_peer.as_secs_f64());
-        metrics.duration_fill_request_from_hashes_pending_fetch.set(fill_request.as_secs_f64());
+        metrics
+            .fill_request_from_hashes_pending_fetch_duration_seconds
+            .set(fill_request.as_secs_f64());
     }
 
     /// Sets up transaction fetcher with config
@@ -939,7 +941,7 @@ impl TransactionFetcher {
 
                 let unsolicited = unverified_len - verified_payload.len();
                 if unsolicited > 0 {
-                    self.metrics.unsolicited_transactions.increment(unsolicited as u64);
+                    self.metrics.unsolicited_transactions_total.increment(unsolicited as u64);
                 }
                 if verification_outcome == VerificationOutcome::ReportPeer {
                     // todo: report peer for sending hashes that weren't requested
@@ -994,7 +996,7 @@ impl TransactionFetcher {
                     true
                 });
                 fetched.shrink_to_fit();
-                self.metrics.fetched_transactions.increment(fetched.len() as u64);
+                self.metrics.fetched_transactions_total.increment(fetched.len() as u64);
 
                 if fetched.len() < requested_hashes_len {
                     trace!(target: "net::tx",

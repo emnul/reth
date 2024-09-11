@@ -89,16 +89,26 @@ This list may be non-exhaustive.
 
 #### Component: Network
 
+##### struct NetworkMetrics
 - `network.connected_peers`: Number of currently connected peers
+- `network.backed_off_peers`: Number of currently backed off peers
 - `network.tracked_peers`: Number of peers known to the node
 - `network.pending_session_failures`: Cumulative number of failures of pending sessions
 - `network.closed_sessions`: Total number of sessions closed
 - `network.incoming_connections`: Number of active incoming connections
 - `network.outgoing_connections`: Number of active outgoing connections
-- `network.total_incoming_connections`: Total number of incoming connections handled
-- `network.total_outgoing_connections`: Total number of outgoing connections established
+- `network.pending_outgoing_connections`: Number of currently pending outgoing connections
+- `network.pending_connections_total`: Total number of pending connections, incoming and outgoing.
+- `network.incoming_connections_total`: Total number of incoming connections handled
+- `network.outgoing_connections_total`: Total number of outgoing connections established
 - `network.invalid_messages_received`: Number of invalid/malformed messages received from peers
-- `network.propagated_transactions`: Total number of propagated transactions
+- `network.dropped_eth_requests_at_full_capacity_total`: Number of Eth Requests dropped due to channel being at full capacity
+- `network.network_manager_poll_duration_total_seconds`: Duration in seconds of call to `NetworkManager`'s poll function.
+- `network.network_handle_acc_poll_duration_seconds`: Time spent streaming messages sent over the `NetworkHandle`, which
+can be cloned and shared via `NetworkManager::handle`, in one call to poll the `NetworkManager` future. At least `TransactionsManager` holds this handle.
+- `network.swarm_acc_poll_duration_seconds`: Time spent polling `Swarm`, in one call to poll the `NetworkManager` future.
+
+##### struct SessionManagerMetrics
 - `network.incoming_eth_handshake_peer_error_total`: Total number of errors related to incoming incorrect peer behaviour such as invalid message code, size, encoding, etc.
 - `network.outgoing_eth_handshake_peer_error_total`: Total number of errors related to outgoing incorrect peer behaviour such as invalid message code, size, encoding, etc.
 - `network.incoming_eth_handshake_timeout_total`: Total number of incoming timeout errors
@@ -111,6 +121,11 @@ This list may be non-exhaustive.
 - `network.outgoing_eth_handshake_genesis_error_total`: Total number of outgoing genesis block mismatch errors
 - `network.incoming_eth_handshake_forkid_error_total`: Total number of incoming fork id mismatch errors
 - `network.outgoing_eth_handshake_forkid_error_total`: Total number of outgoing fork id mismatch errors
+- `network.dial_successes_total`: Total number of successful outgoing dial attempts.
+- `network.outgoing_peer_messages_dropped_total`: Total number of dropped outgoing peer messages.
+
+##### struct TransactionsManagerMetrics
+
 
 [metrics]: https://docs.rs/metrics
 [metrics.Key]: https://docs.rs/metrics/latest/metrics/struct.Key.html

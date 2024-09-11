@@ -154,10 +154,10 @@ impl NetworkManager {
         let NetworkManagerPollDurations { acc_network_handle, acc_swarm } = poll_durations;
 
         // update metrics for whole poll function
-        metrics.duration_poll_network_manager.set(start.elapsed().as_secs_f64());
+        metrics.network_manager_poll_duration_total_seconds.set(start.elapsed().as_secs_f64());
         // update poll metrics for nested items
-        metrics.acc_duration_poll_network_handle.set(acc_network_handle.as_secs_f64());
-        metrics.acc_duration_poll_swarm.set(acc_swarm.as_secs_f64());
+        metrics.network_handle_acc_poll_duration_seconds.set(acc_network_handle.as_secs_f64());
+        metrics.swarm_acc_poll_duration_seconds.set(acc_swarm.as_secs_f64());
     }
 }
 
@@ -421,7 +421,7 @@ impl NetworkManager {
             let _ = reqs.try_send(event).map_err(|e| {
                 if let TrySendError::Full(_) = e {
                     debug!(target:"net", "EthRequestHandler channel is full!");
-                    self.metrics.total_dropped_eth_requests_at_full_capacity.increment(1);
+                    self.metrics.dropped_eth_requests_at_full_capacity_total.increment(1);
                 }
             });
         }
@@ -669,14 +669,14 @@ impl NetworkManager {
             }
             SwarmEvent::IncomingTcpConnection { remote_addr, session_id } => {
                 trace!(target: "net", ?session_id, ?remote_addr, "Incoming connection");
-                self.metrics.total_incoming_connections.increment(1);
+                self.metrics.incoming_connections_total.increment(1);
                 self.metrics
                     .incoming_connections
                     .set(self.swarm.state().peers().num_inbound_connections() as f64);
             }
             SwarmEvent::OutgoingTcpConnection { remote_addr, peer_id } => {
                 trace!(target: "net", ?remote_addr, ?peer_id, "Starting outbound connection.");
-                self.metrics.total_outgoing_connections.increment(1);
+                self.metrics.outgoing_connections_total.increment(1);
                 self.update_pending_connection_metrics()
             }
             SwarmEvent::SessionEstablished {
@@ -945,7 +945,7 @@ impl NetworkManager {
             .pending_outgoing_connections
             .set(self.swarm.state().peers().num_pending_outbound_connections() as f64);
         self.metrics
-            .total_pending_connections
+            .pending_connections_total
             .set(self.swarm.sessions().num_pending_connections() as f64);
     }
 }

@@ -356,7 +356,7 @@ impl SessionManager {
                             ?peer_id,
                             "session command buffer full, dropping message"
                         );
-                        self.metrics.total_outgoing_peer_messages_dropped.increment(1);
+                        self.metrics.outgoing_peer_messages_dropped_total.increment(1);
                     }
                 },
             );
@@ -528,7 +528,7 @@ impl SessionManager {
                 self.counter.inc_active(&direction);
 
                 if direction.is_outgoing() {
-                    self.metrics.total_dial_successes.increment(1);
+                    self.metrics.dial_successes_total.increment(1);
                 }
 
                 Poll::Ready(SessionEvent::SessionEstablished {

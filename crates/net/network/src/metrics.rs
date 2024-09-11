@@ -38,19 +38,19 @@ pub struct NetworkMetrics {
     pub(crate) pending_outgoing_connections: Gauge,
 
     /// Total number of pending connections, incoming and outgoing.
-    pub(crate) total_pending_connections: Gauge,
+    pub(crate) pending_connections_total: Gauge,
 
     /// Total Number of incoming connections handled
-    pub(crate) total_incoming_connections: Counter,
+    pub(crate) incoming_connections_total: Counter,
 
     /// Total Number of outgoing connections established
-    pub(crate) total_outgoing_connections: Counter,
+    pub(crate) outgoing_connections_total: Counter,
 
     /// Number of invalid/malformed messages received from peers
     pub(crate) invalid_messages_received: Counter,
 
     /// Number of Eth Requests dropped due to channel being at full capacity
-    pub(crate) total_dropped_eth_requests_at_full_capacity: Counter,
+    pub(crate) dropped_eth_requests_at_full_capacity_total: Counter,
 
     /* ================ POLL DURATION ================ */
 
@@ -60,7 +60,7 @@ pub struct NetworkMetrics {
     ///
     /// True duration of this call, should be sum of the accumulated durations of calling nested
     // items.
-    pub(crate) duration_poll_network_manager: Gauge,
+    pub(crate) network_manager_poll_duration_total_seconds: Gauge,
 
     /* -- Poll duration of items nested in `NetworkManager` future -- */
     /// Time spent streaming messages sent over the [`NetworkHandle`](crate::NetworkHandle), which
@@ -69,12 +69,12 @@ pub struct NetworkMetrics {
     /// [`TransactionsManager`](crate::transactions::TransactionsManager) holds this handle.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_network_handle: Gauge,
+    pub(crate) network_handle_acc_poll_duration_seconds: Gauge,
     /// Time spent polling [`Swarm`](crate::swarm::Swarm), in one call to poll the
     /// [`NetworkManager`](crate::NetworkManager) future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_swarm: Gauge,
+    pub(crate) swarm_acc_poll_duration_seconds: Gauge,
 }
 
 /// Metrics for `SessionManager`
@@ -108,9 +108,9 @@ pub struct SessionManagerMetrics {
     /// Number of outgoing fork id mismatch errors
     pub(crate) outgoing_eth_handshake_forkid_error_total: Counter,
     /// Number of successful outgoing dial attempts.
-    pub(crate) total_dial_successes: Counter,
+    pub(crate) dial_successes_total: Counter,
     /// Number of dropped outgoing peer messages.
-    pub(crate) total_outgoing_peer_messages_dropped: Counter,
+    pub(crate) outgoing_peer_messages_dropped_total: Counter,
 }
 
 /// Metrics for the [`TransactionsManager`](crate::transactions::TransactionsManager).
@@ -119,29 +119,29 @@ pub struct SessionManagerMetrics {
 pub struct TransactionsManagerMetrics {
     /* ================ BROADCAST ================ */
     /// Total number of propagated transactions
-    pub(crate) propagated_transactions: Counter,
+    pub(crate) propagated_transactions_total: Counter,
     /// Total number of reported bad transactions
-    pub(crate) reported_bad_transactions: Counter,
+    pub(crate) reported_bad_transactions_total: Counter,
 
     /* -- Freq txns already marked as seen by peer -- */
     /// Total number of messages from a peer, announcing transactions that have already been
     /// marked as seen by that peer.
-    pub(crate) messages_with_hashes_already_seen_by_peer: Counter,
+    pub(crate) messages_with_hashes_already_seen_by_peer_total: Counter,
     /// Total number of messages from a peer, with transaction that have already been marked as
     /// seen by that peer.
-    pub(crate) messages_with_transactions_already_seen_by_peer: Counter,
+    pub(crate) messages_with_transactions_already_seen_by_peer_total: Counter,
     /// Total number of occurrences, of a peer announcing a transaction that has already been
     /// marked as seen by that peer.
-    pub(crate) occurrences_hash_already_seen_by_peer: Counter,
+    pub(crate) hash_already_seen_by_peer_occurrences_total: Counter,
     /// Total number of times a transaction is seen from a peer, that has already been marked as
     /// seen by that peer.
-    pub(crate) occurrences_of_transaction_already_seen_by_peer: Counter,
+    pub(crate) transaction_already_seen_by_peer_occurrences_total: Counter,
 
     /* -- Freq txns already in pool -- */
     /// Total number of times a hash is announced that is already in the local pool.
-    pub(crate) occurrences_hashes_already_in_pool: Counter,
+    pub(crate) hashes_already_in_pool_occurrences_total: Counter,
     /// Total number of times a transaction is sent that is already in the local pool.
-    pub(crate) occurrences_transactions_already_in_pool: Counter,
+    pub(crate) transactions_already_in_pool_occurrences_total: Counter,
 
     /* ================ POOL IMPORTS ================ */
     /// Number of transactions about to be imported into the pool.
@@ -149,7 +149,7 @@ pub struct TransactionsManagerMetrics {
     /// Total number of bad imports, imports that fail because the transaction is badly formed
     /// (i.e. have no chance of passing validation, unlike imports that fail due to e.g. nonce
     /// gaps).
-    pub(crate) bad_imports: Counter,
+    pub(crate) bad_imports_total: Counter,
     /// Number of inflight requests at which the
     /// [`TransactionPool`](reth_transaction_pool::TransactionPool) is considered to be at
     /// capacity. Note, this is not a limit to the number of inflight requests, but a health
@@ -164,7 +164,7 @@ pub struct TransactionsManagerMetrics {
     ///
     /// Updating metrics could take time, so the true duration of this call could
     /// be longer than the sum of the accumulated durations of polling nested items.
-    pub(crate) duration_poll_tx_manager: Gauge,
+    pub(crate) tx_manager_acc_poll_duration_seconds: Gauge,
 
     /* -- Poll duration of items nested in `TransactionsManager` future -- */
     /// Accumulated time spent streaming session updates and updating peers accordingly, in
@@ -172,43 +172,43 @@ pub struct TransactionsManagerMetrics {
     /// future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_network_events: Gauge,
+    pub(crate) network_events_acc_poll_duration_seconds: Gauge,
     /// Accumulated time spent flushing the queue of batched pending pool imports into pool, in
     /// one call to poll the [`TransactionsManager`](crate::transactions::TransactionsManager)
     /// future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_pending_pool_imports: Gauge,
+    pub(crate) pending_pool_imports_acc_poll_duration_seconds: Gauge,
     /// Accumulated time spent streaming transaction and announcement broadcast, queueing for
     /// pool import or requesting respectively, in one call to poll the
     /// [`TransactionsManager`](crate::transactions::TransactionsManager) future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_transaction_events: Gauge,
+    pub(crate) transaction_events_acc_poll_duration_seconds: Gauge,
     /// Accumulated time spent streaming fetch events, queueing for pool import on successful
     /// fetch, in one call to poll the
     /// [`TransactionsManager`](crate::transactions::TransactionsManager) future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_fetch_events: Gauge,
+    pub(crate) fetch_events_acc_poll_duration_seconds: Gauge,
     /// Accumulated time spent streaming and propagating transactions that were successfully
     /// imported into the pool, in one call to poll the
     /// [`TransactionsManager`](crate::transactions::TransactionsManager) future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_imported_transactions: Gauge,
+    pub(crate) imported_transactions_acc_poll_duration_seconds: Gauge,
     /// Accumulated time spent assembling and sending requests for hashes fetching pending, in
     /// one call to poll the [`TransactionsManager`](crate::transactions::TransactionsManager)
     /// future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_fetch_pending_hashes: Gauge,
+    pub(crate) fetch_pending_hashes_acc_duration_seconds: Gauge,
     /// Accumulated time spent streaming commands and propagating, fetching and serving
     /// transactions accordingly, in one call to poll the
     /// [`TransactionsManager`](crate::transactions::TransactionsManager) future.
     ///
     /// Duration in seconds.
-    pub(crate) acc_duration_poll_commands: Gauge,
+    pub(crate) poll_commands_acc_duration_seconds: Gauge,
 }
 
 /// Metrics for the [`TransactionsManager`](crate::transactions::TransactionsManager).
@@ -229,25 +229,25 @@ pub struct TransactionFetcherMetrics {
     /// How often we failed to send a request to the peer because the channel was full.
     pub(crate) egress_peer_channel_full: Counter,
     /// Total number of hashes pending fetch.
-    pub(crate) hashes_pending_fetch: Gauge,
+    pub(crate) hashes_pending_fetch_total: Gauge,
     /// Total number of fetched transactions.
-    pub(crate) fetched_transactions: Counter,
+    pub(crate) fetched_transactions_total: Counter,
     /// Total number of transactions that were received in
     /// [`PooledTransactions`](reth_eth_wire::PooledTransactions) responses, that weren't
     /// requested.
-    pub(crate) unsolicited_transactions: Counter,
+    pub(crate) unsolicited_transactions_total: Counter,
     /* ================ SEARCH DURATION ================ */
     /// Time spent searching for an idle peer in call to
     /// [`TransactionFetcher::find_any_idle_fallback_peer_for_any_pending_hash`](crate::transactions::TransactionFetcher::find_any_idle_fallback_peer_for_any_pending_hash).
     ///
     /// Duration in seconds.
-    pub(crate) duration_find_idle_fallback_peer_for_any_pending_hash: Gauge,
+    pub(crate) find_idle_fallback_peer_for_any_pending_hash_duration_seconds: Gauge,
 
     /// Time spent searching for hashes pending fetch, announced by a given peer in
     /// [`TransactionFetcher::fill_request_from_hashes_pending_fetch`](crate::transactions::TransactionFetcher::fill_request_from_hashes_pending_fetch).
     ///
     /// Duration in seconds.
-    pub(crate) duration_fill_request_from_hashes_pending_fetch: Gauge,
+    pub(crate) fill_request_from_hashes_pending_fetch_duration_seconds: Gauge,
 }
 
 /// Measures the duration of executing the given code block. The duration is added to the given
@@ -352,7 +352,7 @@ pub struct EthRequestHandlerMetrics {
 
     /// Duration in seconds of call to poll
     /// [`EthRequestHandler`](crate::eth_requests::EthRequestHandler).
-    pub(crate) acc_duration_poll_eth_req_handler: Gauge,
+    pub(crate) eth_req_handler_poll_duration_seconds: Gauge,
 }
 
 /// Eth67 announcement metrics, track entries by `TxType`

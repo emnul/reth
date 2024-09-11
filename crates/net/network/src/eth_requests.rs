@@ -255,7 +255,7 @@ where
             },
         );
 
-        this.metrics.acc_duration_poll_eth_req_handler.set(acc.as_secs_f64());
+        this.metrics.eth_req_handler_poll_duration_seconds.set(acc.as_secs_f64());
 
         // stream is fully drained and import futures pending
         if maybe_more_incoming_requests {
