@@ -2,6 +2,7 @@
    "__inputs": [
       {
          "name": "DS_PROMETHEUS",
+
          "label": "Prometheus",
          "description": "",
          "type": "datasource",
@@ -3649,7 +3650,7 @@
                   "uid": "${DS_PROMETHEUS}"
                },
                "editorMode": "builder",
-               "expr": "reth_network_total_dial_successes{instance=~\"$instance\"}",
+               "expr": "reth_network_dial_successes_total{instance=~\"$instance\"}",
                "legendFormat": "Total Dial Successes",
                "range": true,
                "refId": "A"

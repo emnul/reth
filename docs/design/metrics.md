@@ -89,7 +89,7 @@ This list may be non-exhaustive.
 
 #### Component: Network
 
-##### struct NetworkMetrics
+##### NetworkMetrics
 Metrics for the entire network, handled by `NetworkManager`
 
 - `network.connected_peers`: Number of currently connected peers
